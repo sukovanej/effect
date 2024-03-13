@@ -1,5 +1,5 @@
 import type { ParseOptions } from "@effect/schema/AST"
-import * as ParseResult from "@effect/schema/ParseResult"
+import * as Parser from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
 import { Bench } from "tinybench"
 import { z } from "zod"
@@ -9,10 +9,10 @@ import { z } from "zod"
 │ (index) │                Task Name                 │  ops/sec  │ Average Time (ns)  │  Margin  │ Samples │
 ├─────────┼──────────────────────────────────────────┼───────────┼────────────────────┼──────────┼─────────┤
 │    0    │   'Schema.decodeUnknownEither (good)'    │ '328,371' │ 3045.328672532268  │ '±1.44%' │ 328372  │
-│    1    │ 'ParseResult.decodeUnknownEither (good)' │ '335,322' │ 2982.2044956612053 │ '±0.48%' │ 335323  │
+│    1    │   'Parser.decodeUnknownEither (good)'    │ '335,322' │ 2982.2044956612053 │ '±0.48%' │ 335323  │
 │    2    │               'zod (good)'               │ '552,477' │ 1810.0287945960085 │ '±0.21%' │ 552478  │
 │    3    │    'Schema.decodeUnknownEither (bad)'    │ '48,031'  │ 20819.486205098154 │ '±0.39%' │  48032  │
-│    4    │ 'ParseResult.decodeUnknownEither (bad)'  │ '292,213' │ 3422.1507011699778 │ '±0.63%' │ 292214  │
+│    4    │    'Parser.decodeUnknownEither (bad)'    │ '292,213' │ 3422.1507011699778 │ '±0.63%' │ 292214  │
 │    5    │               'zod (bad)'                │ '103,400' │ 9671.159100907833  │ '±4.43%' │ 103613  │
 └─────────┴──────────────────────────────────────────┴───────────┴────────────────────┴──────────┴─────────┘
 */
@@ -68,14 +68,14 @@ const bad = {
 }
 
 const schemadecodeUnknownEither = S.decodeUnknownEither(schema)
-const parseResultdecodeUnknownEither = ParseResult.decodeUnknownEither(schema)
+const parseResultdecodeUnknownEither = Parser.decodeUnknownEither(schema)
 const options: ParseOptions = { errors: "all" }
 
 bench
   .add("Schema.decodeUnknownEither (good)", function() {
     schemadecodeUnknownEither(good, options)
   })
-  .add("ParseResult.decodeUnknownEither (good)", function() {
+  .add("Parser.decodeUnknownEither (good)", function() {
     parseResultdecodeUnknownEither(good, options)
   })
   .add("zod (good)", function() {
@@ -84,7 +84,7 @@ bench
   .add("Schema.decodeUnknownEither (bad)", function() {
     schemadecodeUnknownEither(bad, options)
   })
-  .add("ParseResult.decodeUnknownEither (bad)", function() {
+  .add("Parser.decodeUnknownEither (bad)", function() {
     parseResultdecodeUnknownEither(bad, options)
   })
   .add("zod (bad)", function() {

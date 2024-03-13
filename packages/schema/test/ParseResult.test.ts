@@ -1,3 +1,4 @@
+import * as Parser from "@effect/schema/Parser"
 import * as ParseResult from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import { Effect, Either, Exit } from "effect"
@@ -193,10 +194,10 @@ describe("ParseIssue.actual", () => {
   })
 
   it("decode", () => {
-    expect(Either.isEither(ParseResult.decode(S.string)("a")))
+    expect(Either.isEither(Parser.decode(S.string)("a")))
   })
 
   it("encode", () => {
-    expect(Either.isEither(ParseResult.encode(S.string)("a")))
+    expect(Either.isEither(Parser.encode(S.string)("a")))
   })
 })

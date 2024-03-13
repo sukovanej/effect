@@ -3303,6 +3303,7 @@ Error: Error: Expected FileFromSelf, actual null
 Type constructors are generic types that take one or more types as arguments and return a new type. If you need to define a schema for a type constructor, you can use the `S.declare` constructor. Let's illustrate this with a schema for `ReadonlySet<A>`:
 
 ```ts
+import * as Parser from "@effect/schema/Parser";
 import * as ParseResult from "@effect/schema/ParseResult";
 import * as S from "@effect/schema/Schema";
 
@@ -3317,7 +3318,7 @@ export const myReadonlySet = <A, I, R>(
     (item) => (input, parseOptions, ast) => {
       if (input instanceof Set) {
         // Decode the elements
-        const elements = ParseResult.decodeUnknown(S.array(item))(
+        const elements = Parser.decodeUnknown(S.array(item))(
           Array.from(input.values()),
           parseOptions
         );
@@ -3330,7 +3331,7 @@ export const myReadonlySet = <A, I, R>(
     (item) => (input, parseOptions, ast) => {
       if (input instanceof Set) {
         // Encode the elements
-        const elements = ParseResult.encodeUnknown(S.array(item))(
+        const elements = Parser.encodeUnknown(S.array(item))(
           Array.from(input.values()),
           parseOptions
         );

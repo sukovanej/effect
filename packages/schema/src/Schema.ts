@@ -343,7 +343,7 @@ export const decodeUnknown = <A, I, R>(
   schema: Schema<A, I, R>,
   options?: ParseOptions
 ) => {
-  const decodeUnknown = ParseResult.decodeUnknown(schema, options)
+  const decodeUnknown = Parser.decodeUnknown(schema, options)
   return (u: unknown, overrideOptions?: ParseOptions): Effect.Effect<A, ParseResult.ParseError, R> =>
     ParseResult.mapError(decodeUnknown(u, overrideOptions), ParseResult.parseError)
 }
@@ -356,7 +356,7 @@ export const decodeUnknownEither = <A, I>(
   schema: Schema<A, I, never>,
   options?: ParseOptions
 ) => {
-  const decodeUnknownEither = ParseResult.decodeUnknownEither(schema, options)
+  const decodeUnknownEither = Parser.decodeUnknownEither(schema, options)
   return (u: unknown, overrideOptions?: ParseOptions): Either.Either<A, ParseResult.ParseError> =>
     Either.mapLeft(decodeUnknownEither(u, overrideOptions), ParseResult.parseError)
 }
@@ -4873,8 +4873,8 @@ export const optionFromSelf = <Value extends Schema.Any>(
 ): optionFromSelf<Value> => {
   return declare(
     [value],
-    (value) => optionParse(ParseResult.decodeUnknown(value)),
-    (value) => optionParse(ParseResult.encodeUnknown(value)),
+    (value) => optionParse(Parser.decodeUnknown(value)),
+    (value) => optionParse(Parser.encodeUnknown(value)),
     {
       description: `Option<${format(value)}>`,
       pretty: optionPretty,
@@ -5099,8 +5099,8 @@ export const eitherFromSelf = <R extends Schema.Any, L extends Schema.Any>({ lef
 }): eitherFromSelf<R, L> => {
   return declare(
     [right, left],
-    (right, left) => eitherParse(ParseResult.decodeUnknown(right), ParseResult.decodeUnknown(left)),
-    (right, left) => eitherParse(ParseResult.encodeUnknown(right), ParseResult.encodeUnknown(left)),
+    (right, left) => eitherParse(Parser.decodeUnknown(right), Parser.decodeUnknown(left)),
+    (right, left) => eitherParse(Parser.encodeUnknown(right), Parser.encodeUnknown(left)),
     {
       description: `Either<${format(left)}, ${format(right)}>`,
       pretty: eitherPretty,
@@ -5249,8 +5249,8 @@ export const readonlyMapFromSelf = <K extends Schema.Any, V extends Schema.Any>(
 }): readonlyMapFromSelf<K, V> => {
   return declare(
     [key, value],
-    (key, value) => readonlyMapParse(ParseResult.decodeUnknown(array(tuple(key, value)))),
-    (key, value) => readonlyMapParse(ParseResult.encodeUnknown(array(tuple(key, value)))),
+    (key, value) => readonlyMapParse(Parser.decodeUnknown(array(tuple(key, value)))),
+    (key, value) => readonlyMapParse(Parser.encodeUnknown(array(tuple(key, value)))),
     {
       description: `ReadonlyMap<${format(key)}, ${format(value)}>`,
       pretty: readonlyMapPretty,
@@ -5334,8 +5334,8 @@ export const readonlySetFromSelf = <Value extends Schema.Any>(
 ): readonlySetFromSelf<Value> => {
   return declare(
     [value],
-    (item) => readonlySetParse(ParseResult.decodeUnknown(array(item))),
-    (item) => readonlySetParse(ParseResult.encodeUnknown(array(item))),
+    (item) => readonlySetParse(Parser.decodeUnknown(array(item))),
+    (item) => readonlySetParse(Parser.encodeUnknown(array(item))),
     {
       description: `ReadonlySet<${format(value)}>`,
       pretty: readonlySetPretty,
@@ -5769,8 +5769,8 @@ export interface chunkFromSelf<Value extends Schema.Any> extends
 export const chunkFromSelf = <Value extends Schema.Any>(value: Value): chunkFromSelf<Value> => {
   return declare(
     [value],
-    (item) => chunkParse(ParseResult.decodeUnknown(array(item))),
-    (item) => chunkParse(ParseResult.encodeUnknown(array(item))),
+    (item) => chunkParse(Parser.decodeUnknown(array(item))),
+    (item) => chunkParse(Parser.encodeUnknown(array(item))),
     {
       description: `Chunk<${format(value)}>`,
       pretty: chunkPretty,
@@ -5841,8 +5841,8 @@ export const dataFromSelf = <
 ): Schema<A, I, R> => {
   return declare(
     [item],
-    (item) => dataParse(ParseResult.decodeUnknown(item)),
-    (item) => dataParse(ParseResult.encodeUnknown(item)),
+    (item) => dataParse(Parser.decodeUnknown(item)),
+    (item) => dataParse(Parser.encodeUnknown(item)),
     {
       description: `Data<${format(item)}>`,
       pretty: dataPretty,
@@ -6537,8 +6537,8 @@ export const causeFromSelf = <E extends Schema.Any, DR = never>({ defect = unkno
 }): causeFromSelf<E, DR> => {
   return declare(
     [error, defect],
-    (error, defect) => causeParse(ParseResult.decodeUnknown(causeEncoded(error, defect))),
-    (error, defect) => causeParse(ParseResult.encodeUnknown(causeEncoded(error, defect))),
+    (error, defect) => causeParse(Parser.decodeUnknown(causeEncoded(error, defect))),
+    (error, defect) => causeParse(Parser.encodeUnknown(causeEncoded(error, defect))),
     {
       description: `Cause<${format(error)}>`,
       pretty: causePretty,
@@ -6737,13 +6737,13 @@ export const exitFromSelf = <A extends Schema.Any, E extends Schema.Any, DR = ne
     [success, failure, defect],
     (success, failure, defect) =>
       exitParse(
-        ParseResult.decodeUnknown(success),
-        ParseResult.decodeUnknown(causeFromSelf({ error: failure, defect }))
+        Parser.decodeUnknown(success),
+        Parser.decodeUnknown(causeFromSelf({ error: failure, defect }))
       ),
     (success, failure, defect) =>
       exitParse(
-        ParseResult.encodeUnknown(success),
-        ParseResult.encodeUnknown(causeFromSelf({ error: failure, defect }))
+        Parser.encodeUnknown(success),
+        Parser.encodeUnknown(causeFromSelf({ error: failure, defect }))
       ),
     {
       description: `Exit<${format(failure)}, ${format(success)}>`,
@@ -6835,8 +6835,8 @@ export const hashSetFromSelf = <Value extends Schema.Any>(
 ): hashSetFromSelf<Value> => {
   return declare(
     [value],
-    (item) => hashSetParse(ParseResult.decodeUnknown(array(item))),
-    (item) => hashSetParse(ParseResult.encodeUnknown(array(item))),
+    (item) => hashSetParse(Parser.decodeUnknown(array(item))),
+    (item) => hashSetParse(Parser.encodeUnknown(array(item))),
     {
       description: `HashSet<${format(value)}>`,
       pretty: hashSetPretty,
@@ -6931,8 +6931,8 @@ export const hashMapFromSelf = <K extends Schema.Any, V extends Schema.Any>({ ke
 }): hashMapFromSelf<K, V> => {
   return declare(
     [key, value],
-    (key, value) => hashMapParse(ParseResult.decodeUnknown(array(tuple(key, value)))),
-    (key, value) => hashMapParse(ParseResult.encodeUnknown(array(tuple(key, value)))),
+    (key, value) => hashMapParse(Parser.decodeUnknown(array(tuple(key, value)))),
+    (key, value) => hashMapParse(Parser.encodeUnknown(array(tuple(key, value)))),
     {
       description: `HashMap<${format(key)}, ${format(value)}>`,
       pretty: hashMapPretty,
@@ -7019,8 +7019,8 @@ export const listFromSelf = <Value extends Schema.Any>(
 ): listFromSelf<Value> => {
   return declare(
     [value],
-    (item) => listParse(ParseResult.decodeUnknown(array(item))),
-    (item) => listParse(ParseResult.encodeUnknown(array(item))),
+    (item) => listParse(Parser.decodeUnknown(array(item))),
+    (item) => listParse(Parser.encodeUnknown(array(item))),
     {
       description: `List<${format(value)}>`,
       pretty: listPretty,
@@ -7097,8 +7097,8 @@ export const sortedSetFromSelf = <Value extends Schema.Any>(
 ): sortedSetFromSelf<Value> => {
   return declare(
     [value],
-    (item) => sortedSetParse(ParseResult.decodeUnknown(array(item)), ordA),
-    (item) => sortedSetParse(ParseResult.encodeUnknown(array(item)), ordI),
+    (item) => sortedSetParse(Parser.decodeUnknown(array(item)), ordA),
+    (item) => sortedSetParse(Parser.encodeUnknown(array(item)), ordI),
     {
       description: `SortedSet<${format(value)}>`,
       pretty: sortedSetPretty,
